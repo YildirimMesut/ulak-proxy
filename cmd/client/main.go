@@ -28,7 +28,6 @@ func main() {
 	log.Println("╚══════════════════════════════════════════╝")
 	log.Printf("[*] Relay: %s", *relayAddr)
 	log.Printf("[*] Auto-Reconnect: %v (Delay: %ds)", !*noReconnect, *retryDelay)
-	log.Println("[!] ICMP (ping) için Yönetici/root olarak çalıştır")
 	log.Println()
 
 	ag := agent.New(agent.Config{

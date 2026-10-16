@@ -115,7 +115,7 @@ func newNetstack(agentIP, relayIP net.IP) (*netstack, error) {
 func (ns *netstack) initICMP() {
 	c, err := icmp.ListenPacket("ip4:icmp", "0.0.0.0")
 	if err != nil {
-		log.Printf("[!] ICMP raw socket unavailable (%v) — run as Administrator for ping support", err)
+		log.Printf("[!] ICMP raw socket unavailable (%v) — ping desteği olmadan devam edilecek", err)
 		return
 	}
 	ns.icmpConn = c
@@ -183,7 +183,7 @@ func (ns *netstack) injectPacket(pkt []byte) error {
 					go ns.forwardICMP(pkt)
 					return nil
 				} else {
-					log.Printf("[!] ICMP skipped (no raw socket): run as Administrator")
+					log.Printf("[!] ICMP skipped (no raw socket)")
 					return nil
 				}
 			}

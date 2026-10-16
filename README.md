@@ -94,8 +94,6 @@ mesut-proxy-server-windows-amd64.exe -listen 0.0.0.0:443 -secret GüçlüŞifre1
 mesut-proxy-client-windows-amd64.exe -relay SERVER_IP:443 -secret GüçlüŞifre123
 ```
 
-> ICMP (ping) desteği için **Yönetici (Administrator)** olarak çalıştır.
-
 **Linux (iç ağdaki makine):**
 ```bash
 chmod +x mesut-proxy-client-linux-amd64
@@ -151,7 +149,7 @@ forward 0 8080 9090
 
 | Konu | Açıklama |
 |------|----------|
-| **ICMP (ping)** | Agent Administrator/root olarak çalışmalıdır |
+| **ICMP (ping)** | Windows agent'ta yönetici yetkisi gerekmez; Linux agent'ta root gerekli |
 | **Tarama yeri** | nxc/nmap server'da çalıştırılmalı, agent'ta değil |
 | **Çakışan route'lar** | Ligolo veya başka bir tunnel varsa, ulak-proxy route'ları otomatik devralır |
 | **Çoklu agent** | Birden fazla agent aynı anda bağlanabilir; her biri ayrı TUN alır |
@@ -279,8 +277,6 @@ mesut-proxy-server-windows-amd64.exe -listen 0.0.0.0:443 -secret StrongPassword1
 mesut-proxy-client-windows-amd64.exe -relay SERVER_IP:443 -secret StrongPassword123
 ```
 
-> Run as **Administrator** for ICMP (ping) support.
-
 **Linux (machine inside the target network):**
 ```bash
 chmod +x mesut-proxy-client-linux-amd64
@@ -336,7 +332,7 @@ forward 0 8080 9090
 
 | Topic | Details |
 |-------|---------|
-| **ICMP (ping)** | Agent must run as Administrator/root |
+| **ICMP (ping)** | No admin required on Windows agent; Linux agent requires root |
 | **Scanning location** | Run nxc/nmap on the server, not the agent |
 | **Route conflicts** | If ligolo or another tunnel is present, ulak-proxy automatically overrides its routes |
 | **Multiple agents** | Multiple agents can connect simultaneously; each gets its own TUN interface |
