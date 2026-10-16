@@ -3,7 +3,6 @@
 **TR** | [EN](#english)
 
 TCP tüneli üzerinden iç ağlara erişim sağlayan hafif bir proxy/tunnel aracı.  
-*Ulak: Osmanlıca'da resmi haber ve paket taşıyan kişi.*
 
 ---
 
