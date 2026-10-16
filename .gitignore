@@ -1,0 +1,14 @@
+# Routes dosyası (ağ topolojisi içerir, paylaşma)
+dist/mesut-proxy-routes.json
+
+# ZIP paketler
+dist/*.zip
+
+# Go build cache
+*.test
+*.out
+
+# IDE
+.vscode/
+.idea/
+*.swp
