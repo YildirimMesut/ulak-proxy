@@ -6,7 +6,7 @@ import (
 	"os"
 	"time"
 
-	"mesut-proxy-win/internal/agent"
+	"ulak-proxy/internal/agent"
 )
 
 func main() {
@@ -24,7 +24,7 @@ func main() {
 	}
 
 	log.Println("╔══════════════════════════════════════════╗")
-	log.Println("║         Mesut-Proxy  — Agent             ║")
+	log.Println("║          Ulak-Proxy  — Agent             ║")
 	log.Println("╚══════════════════════════════════════════╝")
 	log.Printf("[*] Relay: %s", *relayAddr)
 	log.Printf("[*] Auto-Reconnect: %v (Delay: %ds)", !*noReconnect, *retryDelay)

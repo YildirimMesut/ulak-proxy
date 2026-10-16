@@ -17,7 +17,7 @@ import (
 	"sync/atomic"
 	"time"
 
-	"mesut-proxy-win/internal/protocol"
+	"ulak-proxy/internal/protocol"
 )
 
 type Config struct {
@@ -77,10 +77,10 @@ type Relay struct {
 
 func New(cfg Config) *Relay {
 	if cfg.TUNPrefix == "" {
-		cfg.TUNPrefix = "mesut"
+		cfg.TUNPrefix = "ulak"
 	}
 	if cfg.RoutesFile == "" {
-		cfg.RoutesFile = "mesut-proxy-routes.json"
+		cfg.RoutesFile = "routes.json"
 	}
 	return &Relay{
 		cfg:      cfg,
@@ -456,7 +456,7 @@ func (r *Relay) runConsole() {
 	scanner := bufio.NewScanner(os.Stdin)
 	printHelp()
 	for {
-		fmt.Print("mesut-proxy> ")
+		fmt.Print("ulak-proxy> ")
 		if !scanner.Scan() {
 			return
 		}

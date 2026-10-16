@@ -2,7 +2,7 @@
 setlocal enabledelayedexpansion
 
 echo ================================================
-echo   Mesut-Proxy-Win Build Script
+echo   Ulak-Proxy Build Script
 echo   (Windows + Linux Server destegi)
 echo ================================================
 echo.
@@ -37,13 +37,13 @@ if %ERRORLEVEL% NEQ 0 (
 )
 
 echo.
-echo [2/7] SERVER: Windows amd64 (TAP-Windows surucusu gerektirir)...
+echo [2/7] SERVER: Windows amd64...
 set CGO_ENABLED=0
 set GOOS=windows
 set GOARCH=amd64
-"%GOCMD%" build -ldflags="-s -w" -o dist\mesut-proxy-server-windows-amd64.exe ./cmd/server
+"%GOCMD%" build -ldflags="-s -w" -o dist\ulak-server-windows-amd64.exe ./cmd/server
 if %ERRORLEVEL% EQU 0 (
-    echo [+] dist\mesut-proxy-server-windows-amd64.exe
+    echo [+] dist\ulak-server-windows-amd64.exe
 ) else (
     echo [HATA] Windows server derlenemedi
     pause
@@ -55,9 +55,9 @@ echo [3/7] SERVER: Linux amd64...
 set CGO_ENABLED=0
 set GOOS=linux
 set GOARCH=amd64
-"%GOCMD%" build -ldflags="-s -w" -o dist\mesut-proxy-server-linux-amd64 ./cmd/server
+"%GOCMD%" build -ldflags="-s -w" -o dist\ulak-server-linux-amd64 ./cmd/server
 if %ERRORLEVEL% EQU 0 (
-    echo [+] dist\mesut-proxy-server-linux-amd64
+    echo [+] dist\ulak-server-linux-amd64
 ) else (
     echo [HATA] Linux server derlenemedi
     pause
@@ -69,9 +69,9 @@ echo [4/7] SERVER: Linux arm64 (Raspberry Pi vb.)...
 set CGO_ENABLED=0
 set GOOS=linux
 set GOARCH=arm64
-"%GOCMD%" build -ldflags="-s -w" -o dist\mesut-proxy-server-linux-arm64 ./cmd/server
+"%GOCMD%" build -ldflags="-s -w" -o dist\ulak-server-linux-arm64 ./cmd/server
 if %ERRORLEVEL% EQU 0 (
-    echo [+] dist\mesut-proxy-server-linux-arm64
+    echo [+] dist\ulak-server-linux-arm64
 ) else (
     echo [UYARI] Linux arm64 server derlenemedi (devam ediliyor)
 )
@@ -81,9 +81,9 @@ echo [5/7] CLIENT: Windows amd64...
 set CGO_ENABLED=0
 set GOOS=windows
 set GOARCH=amd64
-"%GOCMD%" build -ldflags="-s -w" -o dist\mesut-proxy-client-windows-amd64.exe ./cmd/client
+"%GOCMD%" build -ldflags="-s -w" -o dist\ulak-client-windows-amd64.exe ./cmd/client
 if %ERRORLEVEL% EQU 0 (
-    echo [+] dist\mesut-proxy-client-windows-amd64.exe
+    echo [+] dist\ulak-client-windows-amd64.exe
 ) else (
     echo [HATA] Windows client derlenemedi
     pause
@@ -95,9 +95,9 @@ echo [6/7] CLIENT: Linux amd64...
 set CGO_ENABLED=0
 set GOOS=linux
 set GOARCH=amd64
-"%GOCMD%" build -ldflags="-s -w" -o dist\mesut-proxy-client-linux-amd64 ./cmd/client
+"%GOCMD%" build -ldflags="-s -w" -o dist\ulak-client-linux-amd64 ./cmd/client
 if %ERRORLEVEL% EQU 0 (
-    echo [+] dist\mesut-proxy-client-linux-amd64
+    echo [+] dist\ulak-client-linux-amd64
 ) else (
     echo [HATA] Linux client derlenemedi
     pause
@@ -109,9 +109,9 @@ echo [7/7] CLIENT: Linux arm64...
 set CGO_ENABLED=0
 set GOOS=linux
 set GOARCH=arm64
-"%GOCMD%" build -ldflags="-s -w" -o dist\mesut-proxy-client-linux-arm64 ./cmd/client
+"%GOCMD%" build -ldflags="-s -w" -o dist\ulak-client-linux-arm64 ./cmd/client
 if %ERRORLEVEL% EQU 0 (
-    echo [+] dist\mesut-proxy-client-linux-arm64
+    echo [+] dist\ulak-client-linux-arm64
 ) else (
     echo [UYARI] Linux arm64 client derlenemedi (devam ediliyor)
 )
@@ -122,8 +122,7 @@ echo TAMAMLANDI! dist\ klasorundeki dosyalar:
 echo.
 for %%f in (dist\*) do echo   %%f
 echo.
-echo NOT: Windows server icin TAP-Windows surucusu gerekli.
-echo      OpenVPN kurarsan otomatik gelir:
-echo      https://openvpn.net/community-downloads/
+echo NOT: Windows server icin wintun.dll gerekli.
+echo      https://www.wintun.net/
 echo ================================================
 pause

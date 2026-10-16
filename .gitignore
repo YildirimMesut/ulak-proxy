@@ -1,5 +1,5 @@
 # Routes dosyası (ağ topolojisi içerir, paylaşma)
-dist/mesut-proxy-routes.json
+dist/routes.json
 
 # ZIP paketler
 dist/*.zip

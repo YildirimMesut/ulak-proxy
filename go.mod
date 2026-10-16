@@ -1,4 +1,4 @@
-module mesut-proxy-win
+module ulak-proxy
 
 go 1.26.3
 

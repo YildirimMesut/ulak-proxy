@@ -36,10 +36,10 @@ TCP tüneli üzerinden iç ağlara erişim sağlayan hafif bir proxy/tunnel arac
 
 | Binary | Platform |
 |--------|----------|
-| `mesut-proxy-server-linux-amd64` | Linux x64 Server |
-| `mesut-proxy-server-windows-amd64.exe` | Windows x64 Server |
-| `mesut-proxy-client-windows-amd64.exe` | Windows x64 Agent |
-| `mesut-proxy-client-linux-amd64` | Linux x64 Agent |
+| `ulak-server-linux-amd64` | Linux x64 Server |
+| `ulak-server-windows-amd64.exe` | Windows x64 Server |
+| `ulak-client-windows-amd64.exe` | Windows x64 Agent |
+| `ulak-client-linux-amd64` | Linux x64 Agent |
 
 ---
 
@@ -47,8 +47,8 @@ TCP tüneli üzerinden iç ağlara erişim sağlayan hafif bir proxy/tunnel arac
 
 ### 1. Route Dosyasını Hazırla
 
-`mesut-proxy-routes.json` dosyasını server ile **aynı klasöre** koy.  
-`mesut-proxy-routes.json.example` dosyasını kopyalayıp düzenleyebilirsin:
+`routes.json` dosyasını server ile **aynı klasöre** koy.  
+`routes.json.example` dosyasını kopyalayıp düzenleyebilirsin:
 
 ```json
 {
@@ -68,13 +68,13 @@ TCP tüneli üzerinden iç ağlara erişim sağlayan hafif bir proxy/tunnel arac
 
 **Linux (root gerekli):**
 ```bash
-chmod +x mesut-proxy-server-linux-amd64
-sudo ./mesut-proxy-server-linux-amd64 -listen 0.0.0.0:443 -secret GüçlüŞifre123
+chmod +x ulak-server-linux-amd64
+sudo ./ulak-server-linux-amd64 -listen 0.0.0.0:443 -secret GüçlüŞifre123
 ```
 
 **Windows (Administrator olarak çalıştır):**
 ```
-mesut-proxy-server-windows-amd64.exe -listen 0.0.0.0:443 -secret GüçlüŞifre123
+ulak-server-windows-amd64.exe -listen 0.0.0.0:443 -secret GüçlüŞifre123
 ```
 > Windows server için `wintun.dll` exe ile aynı klasörde olmalıdır.
 
@@ -83,7 +83,7 @@ mesut-proxy-server-windows-amd64.exe -listen 0.0.0.0:443 -secret GüçlüŞifre1
 | `-listen` | Dinlenecek adres | `0.0.0.0:7777` |
 | `-secret` | Agent kimlik doğrulaması | *zorunlu* |
 | `-prefix` | TUN arayüz adı öneki | `mesut` |
-| `-routes` | Route dosyası yolu | `mesut-proxy-routes.json` |
+| `-routes` | Route dosyası yolu | `routes.json` |
 
 ---
 
@@ -91,13 +91,13 @@ mesut-proxy-server-windows-amd64.exe -listen 0.0.0.0:443 -secret GüçlüŞifre1
 
 **Windows (iç ağdaki makine):**
 ```
-mesut-proxy-client-windows-amd64.exe -relay SERVER_IP:443 -secret GüçlüŞifre123
+ulak-client-windows-amd64.exe -relay SERVER_IP:443 -secret GüçlüŞifre123
 ```
 
 **Linux (iç ağdaki makine):**
 ```bash
-chmod +x mesut-proxy-client-linux-amd64
-sudo ./mesut-proxy-client-linux-amd64 -relay SERVER_IP:443 -secret GüçlüŞifre123
+chmod +x ulak-client-linux-amd64
+sudo ./ulak-client-linux-amd64 -relay SERVER_IP:443 -secret GüçlüŞifre123
 ```
 
 | Parametre | Açıklama | Varsayılan |
@@ -167,10 +167,10 @@ build.bat
 
 Ya da manuel:
 ```bash
-GOOS=linux  GOARCH=amd64 go build -o dist/mesut-proxy-server-linux-amd64       ./cmd/server
-GOOS=windows GOARCH=amd64 go build -o dist/mesut-proxy-server-windows-amd64.exe ./cmd/server
-GOOS=windows GOARCH=amd64 go build -o dist/mesut-proxy-client-windows-amd64.exe ./cmd/client
-GOOS=linux  GOARCH=amd64 go build -o dist/mesut-proxy-client-linux-amd64       ./cmd/client
+GOOS=linux  GOARCH=amd64 go build -o dist/ulak-server-linux-amd64       ./cmd/server
+GOOS=windows GOARCH=amd64 go build -o dist/ulak-server-windows-amd64.exe ./cmd/server
+GOOS=windows GOARCH=amd64 go build -o dist/ulak-client-windows-amd64.exe ./cmd/client
+GOOS=linux  GOARCH=amd64 go build -o dist/ulak-client-linux-amd64       ./cmd/client
 ```
 
 > Windows server için `wintun.dll`'i [wintun.net](https://www.wintun.net/) adresinden indirip `dist/` klasörüne koy.
@@ -219,10 +219,10 @@ The **Agent** runs inside the target network and establishes real TCP connection
 
 | Binary | Platform |
 |--------|----------|
-| `mesut-proxy-server-linux-amd64` | Linux x64 Server |
-| `mesut-proxy-server-windows-amd64.exe` | Windows x64 Server |
-| `mesut-proxy-client-windows-amd64.exe` | Windows x64 Agent |
-| `mesut-proxy-client-linux-amd64` | Linux x64 Agent |
+| `ulak-server-linux-amd64` | Linux x64 Server |
+| `ulak-server-windows-amd64.exe` | Windows x64 Server |
+| `ulak-client-windows-amd64.exe` | Windows x64 Agent |
+| `ulak-client-linux-amd64` | Linux x64 Agent |
 
 ---
 
@@ -230,8 +230,8 @@ The **Agent** runs inside the target network and establishes real TCP connection
 
 ### 1. Prepare the Routes File
 
-Place `mesut-proxy-routes.json` in the **same directory** as the server binary.  
-Copy `mesut-proxy-routes.json.example` and edit it:
+Place `routes.json` in the **same directory** as the server binary.  
+Copy `routes.json.example` and edit it:
 
 ```json
 {
@@ -251,13 +251,13 @@ Copy `mesut-proxy-routes.json.example` and edit it:
 
 **Linux (requires root):**
 ```bash
-chmod +x mesut-proxy-server-linux-amd64
-sudo ./mesut-proxy-server-linux-amd64 -listen 0.0.0.0:443 -secret StrongPassword123
+chmod +x ulak-server-linux-amd64
+sudo ./ulak-server-linux-amd64 -listen 0.0.0.0:443 -secret StrongPassword123
 ```
 
 **Windows (run as Administrator):**
 ```
-mesut-proxy-server-windows-amd64.exe -listen 0.0.0.0:443 -secret StrongPassword123
+ulak-server-windows-amd64.exe -listen 0.0.0.0:443 -secret StrongPassword123
 ```
 > Windows server requires `wintun.dll` in the same directory.
 
@@ -266,7 +266,7 @@ mesut-proxy-server-windows-amd64.exe -listen 0.0.0.0:443 -secret StrongPassword1
 | `-listen` | Address to listen on | `0.0.0.0:7777` |
 | `-secret` | Agent authentication secret | *required* |
 | `-prefix` | TUN interface name prefix | `mesut` |
-| `-routes` | Routes file path | `mesut-proxy-routes.json` |
+| `-routes` | Routes file path | `routes.json` |
 
 ---
 
@@ -274,13 +274,13 @@ mesut-proxy-server-windows-amd64.exe -listen 0.0.0.0:443 -secret StrongPassword1
 
 **Windows (machine inside the target network):**
 ```
-mesut-proxy-client-windows-amd64.exe -relay SERVER_IP:443 -secret StrongPassword123
+ulak-client-windows-amd64.exe -relay SERVER_IP:443 -secret StrongPassword123
 ```
 
 **Linux (machine inside the target network):**
 ```bash
-chmod +x mesut-proxy-client-linux-amd64
-sudo ./mesut-proxy-client-linux-amd64 -relay SERVER_IP:443 -secret StrongPassword123
+chmod +x ulak-client-linux-amd64
+sudo ./ulak-client-linux-amd64 -relay SERVER_IP:443 -secret StrongPassword123
 ```
 
 | Flag | Description | Default |
@@ -350,10 +350,10 @@ build.bat
 
 Or manually:
 ```bash
-GOOS=linux   GOARCH=amd64 go build -o dist/mesut-proxy-server-linux-amd64       ./cmd/server
-GOOS=windows GOARCH=amd64 go build -o dist/mesut-proxy-server-windows-amd64.exe ./cmd/server
-GOOS=windows GOARCH=amd64 go build -o dist/mesut-proxy-client-windows-amd64.exe ./cmd/client
-GOOS=linux   GOARCH=amd64 go build -o dist/mesut-proxy-client-linux-amd64       ./cmd/client
+GOOS=linux   GOARCH=amd64 go build -o dist/ulak-server-linux-amd64       ./cmd/server
+GOOS=windows GOARCH=amd64 go build -o dist/ulak-server-windows-amd64.exe ./cmd/server
+GOOS=windows GOARCH=amd64 go build -o dist/ulak-client-windows-amd64.exe ./cmd/client
+GOOS=linux   GOARCH=amd64 go build -o dist/ulak-client-linux-amd64       ./cmd/client
 ```
 
 > Download `wintun.dll` from [wintun.net](https://www.wintun.net/) and place it in `dist/` for Windows server support.

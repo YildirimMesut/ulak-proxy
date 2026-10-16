@@ -6,14 +6,14 @@ import (
 	"os"
 	"runtime"
 
-	"mesut-proxy-win/internal/relay"
+	"ulak-proxy/internal/relay"
 )
 
 func main() {
 	listen := flag.String("listen", "0.0.0.0:7777", "Dinlenecek adres")
 	secret := flag.String("secret", "", "Kimlik doğrulama şifresi (zorunlu)")
-	prefix := flag.String("prefix", "mesut", "TUN/TAP arayüz adı ön eki")
-	routes := flag.String("routes", "mesut-proxy-routes.json", "Kalıcı route dosyası")
+	prefix := flag.String("prefix", "ulak", "TUN/TAP arayüz adı ön eki")
+	routes := flag.String("routes", "routes.json", "Kalıcı route dosyası")
 	flag.Parse()
 
 	if *secret == "" {
@@ -23,7 +23,7 @@ func main() {
 	}
 
 	log.Println("╔══════════════════════════════════════════╗")
-	log.Println("║      Mesut-Proxy  — Relay Server         ║")
+	log.Println("║       Ulak-Proxy  — Relay Server         ║")
 	log.Println("╚══════════════════════════════════════════╝")
 	log.Printf("[*] OS:      %s/%s", runtime.GOOS, runtime.GOARCH)
 	log.Printf("[*] Listen:  %s", *listen)

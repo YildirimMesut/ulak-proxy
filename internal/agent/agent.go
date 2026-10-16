@@ -10,7 +10,7 @@ import (
 	"sync"
 	"time"
 
-	"mesut-proxy-win/internal/protocol"
+	"ulak-proxy/internal/protocol"
 )
 
 
