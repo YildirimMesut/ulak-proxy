@@ -160,7 +160,17 @@ func (r *Relay) handleAgent(conn net.Conn) {
 		return
 	}
 
-	r.routes.ApplyAll(tunName)
+	// Kayıtlı route'ları uygula. Yeniden bağlanan agent yeni bir TUN adı
+	// aldığında, eski adaptöre ait route'lar bu yeni adaptöre taşınır
+	// (bkz. routeStore.ApplyAll) — aksi halde tünel bağlı görünür ama iç ağa
+	// hiçbir route kalmazdı.
+	r.mu.Lock()
+	activeTUNs := make([]string, 0, len(r.active))
+	for _, s := range r.active {
+		activeTUNs = append(activeTUNs, s.tunName)
+	}
+	r.mu.Unlock()
+	r.routes.ApplyAll(tunName, activeTUNs)
 
 	if err := protocol.SendAuthOK(conn, relayIP, agentIP); err != nil {
 		log.Printf("[!] SendAuthOK: %v", err)
@@ -171,7 +181,7 @@ func (r *Relay) handleAgent(conn net.Conn) {
 		id: id, tunName: tunName,
 		relayIP: relayIP, agentIP: agentIP,
 		tun: tun, conn: conn,
-		writeCh: make(chan []byte, 512),
+		writeCh: make(chan []byte, 2048),
 		streams: make(map[uint32]net.Conn),
 	}
 
@@ -267,12 +277,18 @@ func (r *Relay) forward(sess *agentSession) {
 					log.Printf("[!] Agent %d TCP read: %v", sess.id, err)
 				}
 				cancel()
+				// Bağlantıyı da kapat: writer goroutine'i conn.Write'ta
+				// bloklanmış olabilir (yarı-kapalı TCP), aksi halde
+				// writerWg.Wait() sonsuza kadar bekleyebilir.
+				sess.conn.Close()
 				sess.tun.Close()
 				return
 			}
 			switch ft {
 			case protocol.TypeTUN:
 				if _, err := sess.tun.Write(payload); err != nil {
+					// Yalnızca gerçek adaptör hataları buraya düşer; ring taşması
+					// artık tun_windows.go içinde ele alınıp tünel korunuyor.
 					log.Printf("[!] Agent %d TUN write: %v", sess.id, err)
 					cancel()
 					sess.tun.Close()
@@ -287,6 +303,11 @@ func (r *Relay) forward(sess *agentSession) {
 				ec, ok := sess.streams[streamID]
 				sess.streamMu.Unlock()
 				if ok && len(data) > 0 {
+					// Yazma deadline'ı: tüketmeyi bırakan bir port-forward
+					// istemcisi buradaki tek okuyucu goroutine'i sonsuza kadar
+					// bloklayıp BÜTÜN tüneli dondurmasın; stream kapatılır,
+					// tünel yaşamaya devam eder.
+					_ = ec.SetWriteDeadline(time.Now().Add(10 * time.Second))
 					if _, werr := ec.Write(data); werr != nil {
 						sess.writeFrame(protocol.TypeFwdClose, uint32ToBytes(streamID))
 						sess.streamMu.Lock()
@@ -294,6 +315,7 @@ func (r *Relay) forward(sess *agentSession) {
 						delete(sess.streams, streamID)
 						sess.streamMu.Unlock()
 					}
+					_ = ec.SetWriteDeadline(time.Time{})
 				}
 			case protocol.TypeFwdClose:
 				streamID, err := protocol.ParseFwdClose(payload)

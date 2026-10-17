@@ -51,7 +51,7 @@ TCP tüneli üzerinden iç ağlara erişim sağlayan hafif bir proxy/tunnel arac
 
 ```json
 {
-  "mesut0": [
+  "ulak0": [
     "10.10.10.0/24",
     "192.168.1.0/24",
     "172.16.0.0/16"
@@ -81,7 +81,7 @@ ulak-server-windows-amd64.exe -listen 0.0.0.0:443 -secret GüçlüŞifre123
 |-----------|----------|------------|
 | `-listen` | Dinlenecek adres | `0.0.0.0:7777` |
 | `-secret` | Agent kimlik doğrulaması | *zorunlu* |
-| `-prefix` | TUN arayüz adı öneki | `mesut` |
+| `-prefix` | TUN arayüz adı öneki | `ulak` |
 | `-routes` | Route dosyası yolu | `routes.json` |
 
 ---
@@ -234,7 +234,7 @@ Copy `routes.json.example` and edit it:
 
 ```json
 {
-  "mesut0": [
+  "ulak0": [
     "10.10.10.0/24",
     "192.168.1.0/24",
     "172.16.0.0/16"
@@ -264,7 +264,7 @@ ulak-server-windows-amd64.exe -listen 0.0.0.0:443 -secret StrongPassword123
 |------|-------------|---------|
 | `-listen` | Address to listen on | `0.0.0.0:7777` |
 | `-secret` | Agent authentication secret | *required* |
-| `-prefix` | TUN interface name prefix | `mesut` |
+| `-prefix` | TUN interface name prefix | `ulak` |
 | `-routes` | Routes file path | `routes.json` |
 
 ---

@@ -80,10 +80,52 @@ func (rs *routeStore) Delete(tunName, subnet string) error {
 	return nil
 }
 
-func (rs *routeStore) ApplyAll(tunName string) {
+// ApplyAll, verilen TUN'a kayıtlı route'ları uygular.
+//
+// Bir agent yeniden bağlandığında server ona YENİ bir TUN adı verir
+// (ulak0 → ulak1 → ulak2 ...) ve eski adaptör silinince Windows o adaptöre
+// bağlı tüm route'ları kendiliğinden kaldırır. Eski davranışta routes.json
+// yalnızca eski adla eşleştiği için yeniden bağlanan tünel hiç route'suz
+// kalıyordu — "tünel canlı ama ağ ölü" durumu. Artık: yeni TUN'a kayıtlı route
+// yoksa, artık var olmayan (aktif oturumu olmayan ve OS'te bulunmayan)
+// adaptörlere kayıtlı route'lar yeni TUN'a taşınır, dosya güncellenir ve
+// uygulanır.
+func (rs *routeStore) ApplyAll(tunName string, activeTUNs []string) {
 	rs.mu.Lock()
 	list := make([]string, len(rs.routes[tunName]))
 	copy(list, rs.routes[tunName])
+
+	if len(list) == 0 {
+		active := make(map[string]bool, len(activeTUNs))
+		for _, n := range activeTUNs {
+			active[n] = true
+		}
+		migrated := false
+		for key, subnets := range rs.routes {
+			if key == tunName || (active[key] && ifaceExists(key)) {
+				continue // Bu TUN hâlâ canlı; route'larını çalma.
+			}
+			for _, s := range subnets {
+				dup := false
+				for _, x := range list {
+					if x == s {
+						dup = true
+						break
+					}
+				}
+				if !dup {
+					list = append(list, s)
+				}
+			}
+			delete(rs.routes, key)
+			migrated = true
+		}
+		if migrated {
+			rs.routes[tunName] = list
+			rs.save()
+			log.Printf("[*] routes: %d route yeni TUN %s'e taşındı", len(list), tunName)
+		}
+	}
 	rs.mu.Unlock()
 	for _, s := range list {
 		if err := applyRoute(tunName, s); err != nil {
@@ -92,6 +134,12 @@ func (rs *routeStore) ApplyAll(tunName string) {
 			log.Printf("[*] routes: re-applied %s via %s", s, tunName)
 		}
 	}
+}
+
+// ifaceExists reports whether an OS network interface with the given name exists.
+func ifaceExists(name string) bool {
+	_, err := net.InterfaceByName(name)
+	return err == nil
 }
 
 func (rs *routeStore) List(tunName string) []string {

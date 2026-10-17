@@ -5,13 +5,25 @@ package relay
 import (
 	"fmt"
 	"io"
+	"log"
 	"net"
 	"os/exec"
+	"sync/atomic"
+	"time"
 	"unsafe"
 
 	"golang.org/x/sys/windows"
 	"golang.zx2c4.com/wintun"
 )
+
+// ringCapacity, Wintun oturumu için toplam ring kapasitesi (64 MiB — sürücünün
+// izin verdiği üst sınır). Yarısı send, yarısı receive ring'e ayrılır; büyük
+// kapasite yoğun tarama trafiğindeki kısa süreli yanıt patlamalarını emer ve
+// ERROR_BUFFER_OVERFLOW olasılığını ciddi oranda azaltır.
+const ringCapacity = 0x4000000
+
+// droppedPackets, ring dolu olduğu için düşürülen paket sayısı (yalnızca teşhis).
+var droppedPackets atomic.Uint64
 
 // ---------- Windows API helpers ----------
 
@@ -95,14 +107,37 @@ func (t *wintunIface) Read(buf []byte) (int, error) {
 	}
 }
 
+// Write sends an IP packet into the TUN adapter.
+//
+// Yoğun tarama sırasında Wintun send ring'i kısa süreliğine dolabilir;
+// WintunAllocateSendPacket bu durumda bloklamaz, ERROR_BUFFER_OVERFLOW döndürür.
+// Eskiden bu hata ölümcül kabul edilip tüm tünel kapatılıyordu (5 dakika sonra
+// çökmenin asıl tetikleyicisi). Artık kısa bir süre ring'in boşalması beklenir;
+// yük sürerse paket sessizce düşürülür — içerideki TCP (gVisor tarafında)
+// kendiliğinden yeniden iletir, tünel sağ kalır. Yalnızca gerçek adaptör
+// hataları (EOF vb.) hataya dönüştürülür.
 func (t *wintunIface) Write(buf []byte) (int, error) {
-	pkt, err := t.session.AllocateSendPacket(len(buf))
-	if err != nil {
-		return 0, err
+	const maxOverflowRetries = 15
+	for attempt := 0; ; attempt++ {
+		pkt, err := t.session.AllocateSendPacket(len(buf))
+		if err == nil {
+			copy(pkt, buf)
+			t.session.SendPacket(pkt)
+			return len(buf), nil
+		}
+		if err != windows.ERROR_BUFFER_OVERFLOW {
+			return 0, err
+		}
+		if attempt >= maxOverflowRetries {
+			if n := droppedPackets.Add(1); n == 1 || n%1024 == 0 {
+				log.Printf("[!] Wintun send ring dolu: %d paket düşürüldü (tünel korunuyor)", n)
+			}
+			// Paketi kaybet ama tüneli öldürme.
+			return len(buf), nil
+		}
+		// Ring'in boşalması için kısa bir süre bekle (mikro patlamaları emer).
+		time.Sleep(2 * time.Millisecond)
 	}
-	copy(pkt, buf)
-	t.session.SendPacket(pkt)
-	return len(buf), nil
 }
 
 // Close signals Read to stop, ends the session, and removes the adapter.
@@ -147,7 +182,7 @@ func createTUNIface(name, cidr string) (TUNIface, error) {
 		return nil, fmt.Errorf("close event oluşturulamadı: %w", err)
 	}
 
-	session, err := adapter.StartSession(0x800000)
+	session, err := adapter.StartSession(ringCapacity)
 	if err != nil {
 		windows.CloseHandle(closeEvent)
 		adapter.Close()
